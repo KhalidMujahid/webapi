@@ -1,23 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Data;
+using WebApi.Dto;
 using WebApi.Services;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController(UserService userService) : ControllerBase
+    public class UserController(ApplicationDbContext applicationDbContext) : ControllerBase
     {
-        private readonly UserService _userService = userService;
+        private readonly ApplicationDbContext _context = applicationDbContext;
         [HttpGet]
         public IActionResult GetAllUsers()
         {
-            return Ok(_userService.GetAllUsers());
+            var users = _context.Users.ToList();
+            return Ok(users);
         }
 
         [HttpPost]
-        public IActionResult AddUser([FromBody] string user)
+        public IActionResult AddUser([FromBody] IUser user)
         {
-            return Ok(user);
+            var newUser = new Models.Users
+            {
+                Name = user.Name,
+                Email = user.Email
+            };
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return Ok(new { message = "User added to database", newUser });
         }
     }
 }
