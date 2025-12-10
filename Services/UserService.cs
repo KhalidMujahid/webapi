@@ -1,11 +1,15 @@
+using WebApi.Data;
+using WebApi.Models;
+
 namespace WebApi.Services
 {
-    public class UserService
+    public class UserService(ApplicationDbContext applicationDbContext)
     {
-        private readonly string[] users = { "Ahmed", "Musa", "Yahya" };
-        public string[] GetAllUsers()
+        private readonly ApplicationDbContext _context = applicationDbContext;
+
+        public Users[] GetAllUsers()
         {
-            return users;
+            return [.. _context.Users];
         }
     }
 }
